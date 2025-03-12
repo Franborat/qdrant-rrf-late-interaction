@@ -1,0 +1,37 @@
+services:
+  qdrant_node1:
+    image: qdrant/qdrant:latest
+    restart: always
+    container_name: qdrant_node1
+    ports:
+      - 6333:6333
+    environment:
+      QDRANT__CLUSTER__ENABLED: "true"
+    command: "./qdrant --uri http://qdrant_node1:6335"
+    configs:
+      - source: qdrant_config
+        target: /qdrant/config/production.yaml
+    volumes:
+      - ./qdrant_data_node1:/qdrant/storage
+    mem_limit: 4g
+    mem_reservation: 4g
+    cpus: "2.0"  # Limit the container to 2 CPUs
+  qdrant_node2:
+    image: qdrant/qdrant:latest
+    restart: always
+    container_name: qdrant_node2
+    environment:
+      QDRANT__CLUSTER__ENABLED: "true"
+    command: "./qdrant --bootstrap http://qdrant_node1:6335"
+    configs:
+      - source: qdrant_config
+        target: /qdrant/config/production.yaml
+    volumes:
+      - ./qdrant_data_node2:/qdrant/storage
+    mem_limit: 4g
+    mem_reservation: 4g
+    cpus: "2.0"  # Limit the container to 2 CPUs
+configs:
+  qdrant_config:
+    content: |
+      log_level: INFO
