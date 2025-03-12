@@ -7,6 +7,7 @@ The project consists of:
 - A **Qdrant cluster** (2-node setup using Docker Compose)
 - An **ingestion script (`ingest.py`)** that processes documents and stores embeddings in Qdrant
 - A **querying script (`query.py`)** that searches Qdrant using dense, sparse, and late interaction embeddings
+- A **preprocessed dataset from [ESCI-S](https://github.com/shuttie/esci-s)**
 
 ---
 
@@ -42,10 +43,32 @@ pip install -r requirements.txt
 This will install all necessary libraries, including:
 - `qdrant-client` (Qdrant database client)
 - `fastembed` (embedding model wrapper)
+- `sentence-transformers` (for dense embeddings)
+- `torch` (for late interaction models)
 
 ---
 
-## **3. Ingesting Data into Qdrant**
+## **3. Dataset: ESCI-S (Amazon Shopping Queries)**
+The dataset used in this project comes from **[ESCI-S](https://github.com/shuttie/esci-s)**, a dataset containing product search queries and relevance annotations from Amazon.
+
+### **Preprocessing Steps**
+1. **Filter for English locale (`us`)**
+   ```sh
+   jq -c 'select(.locale == "us")' esci.json > en_esci.json
+   ```
+   This step extracts only the English-language product reviews.
+
+2. **Extract titles and assign random `user_id` as metadata**
+   ```sh
+   cat en_esci.json | jq -c 'reduce inputs as $i ([]; . + [{title: $i.title, user_id: (length % 9 + 1)}]) | .[]' > titles_with_users.json
+   ```
+   This step creates a new JSON file (`titles_with_users.json`) where each entry contains:
+   - **title**: The product title (document text)
+   - **user_id**: A randomly assigned user ID (1 to 9) for metadata-based filtering
+
+---
+
+## **4. Ingesting Data into Qdrant**
 The **`ingest.py`** script:
 - Reads documents from `titles_with_users.json`
 - Computes **dense, sparse, and late interaction embeddings**
@@ -67,7 +90,7 @@ This will:
 
 ---
 
-## **4. Querying Qdrant**
+## **5. Querying Qdrant**
 The **`query.py`** script:
 - Accepts a search query
 - Generates **dense, sparse, and late interaction embeddings**
@@ -84,18 +107,18 @@ This will:
    - **Sparse retrieval** (Splade)
    - **Dense retrieval** (MiniLM)
    - **RRF fusion** to combine rankings
-3. **Apply late interaction reranking** (ColBERT) to refine the top results
+3. **Apply late interaction reranking** to refine the top results
 4. Return the **top 10 most relevant documents**
 
 ---
 
-## **5. Project Structure**
+## **6. Project Structure**
 ```
 ├── docker-compose.yaml   # Qdrant cluster setup
 ├── ingest.py             # Script to process and store documents in Qdrant
 ├── query.py              # Script to search and retrieve documents from Qdrant
 ├── requirements.txt      # Python dependencies
-├── titles_with_users.json # Sample dataset (not included)
+├── titles_with_users.json # Preprocessed dataset from ESCI-S
 ```
 
 ### **Technologies Used**
@@ -106,7 +129,7 @@ This will:
 
 ---
 
-## **6. Customization**
+## **7. Customization**
 ### **Change the Collection Name**
 Modify `collection_name` in **`ingest.py`** and **`query.py`**.
 
@@ -118,7 +141,7 @@ Adjust `limit=10` in **`query.py`** to return more or fewer documents.
 
 ---
 
-## **7. Troubleshooting**
+## **8. Troubleshooting**
 ### **Qdrant Is Not Running**
 Run:
 ```sh
@@ -140,9 +163,12 @@ curl http://localhost:6333/healthz
 
 ---
 
-## **8. Next Steps**
+## **9. Next Steps**
 - Add **semantic filtering** (e.g., filter by `user_id`)
+- Implement **vector quantization for efficiency**
 - Experiment with **different embedding models** for retrieval
 
 🚀 **Enjoy building hybrid search systems with Qdrant!**
+
+
 
