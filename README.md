@@ -137,14 +137,11 @@ curl http://localhost:6333/healthz
 
 ### **Performance Optimization**
 - Increase **shards** and **replication factor** in `ingest.py`
-- Use **binary quantization** for better memory efficiency
-- Adjust **indexing_threshold** after ingestion
 
 ---
 
 ## **8. Next Steps**
 - Add **semantic filtering** (e.g., filter by `user_id`)
-- Implement **vector quantization for efficiency**
 - Experiment with **different embedding models** for retrieval
 
 🚀 **Enjoy building hybrid search systems with Qdrant!**
