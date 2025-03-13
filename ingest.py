@@ -10,7 +10,7 @@ if __name__ == '__main__':
     )
 
     # Name of the collection where embeddings will be stored
-    collection_name = "demo_collection"
+    collection_name = "demo_collection4"
 
     # Path to the JSON file containing document titles and metadata
     payload_path = "titles_with_users.json"
@@ -22,14 +22,14 @@ if __name__ == '__main__':
     with open(payload_path) as fd:
         for line in fd:
             obj = json.loads(line) # Parse each line as a JSON object
-
             # Only add documents that have a non-null title
             if obj.get("title") is not None:
-                documents.append(obj.pop("title")) # Extract title and add it to documents
-                metadata.append(obj) # Store the remaining metadata
+                metadata.append(obj.copy())  # Store the metadata
+                documents.append(obj.pop("title")) # Extract title that will be converted later into embeddings
 
     # Select only the first 1000 documents for embedding
     documents_small = documents[0:1000]
+    metadata_small = metadata[0:1000]
 
     # Load embedding models for dense, sparse, and late interaction embeddings
     dense_embedding_model = TextEmbedding("sentence-transformers/all-MiniLM-L6-v2")
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     # Prepare data points to upload
     points = []
     for idx, (dense_embedding, sparse_embedding, late_interaction_embedding, meta) in enumerate(
-            zip(dense_embeddings, sparse_embeddings, late_interaction_embeddings, metadata)):
+            zip(dense_embeddings, sparse_embeddings, late_interaction_embeddings, metadata_small)):
 
         # Define a Qdrant point with dense, sparse, and late interaction embeddings
         point = models.PointStruct(

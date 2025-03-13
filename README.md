@@ -8,6 +8,7 @@ The project consists of:
 - An **ingestion script (`ingest.py`)** that processes documents and stores embeddings in Qdrant
 - A **querying script (`query.py`)** that searches Qdrant using dense, sparse, and late interaction embeddings
 - A **preprocessed dataset from [ESCI-S](https://github.com/shuttie/esci-s)**
+- **Comparative analysis of different retrieval strategies**
 
 ---
 
@@ -45,6 +46,7 @@ This will install all necessary libraries, including:
 - `fastembed` (embedding model wrapper)
 - `sentence-transformers` (for dense embeddings)
 - `torch` (for late interaction models)
+- `matplotlib` (for visualizing search results)
 
 ---
 
@@ -86,7 +88,6 @@ This will:
 2. **Create a Qdrant collection** (`demo_collection`) if it doesn’t exist
 3. **Convert documents into embeddings**
 4. **Upload embeddings & metadata to Qdrant**
-5. **Optimize indexing** for fast search
 
 ---
 
@@ -96,6 +97,7 @@ The **`query.py`** script:
 - Generates **dense, sparse, and late interaction embeddings**
 - Uses **Reciprocal Rank Fusion (RRF)** to combine results
 - Applies **late interaction reranking** for final ranking
+- **Performs comparative search experiments** and visualizes the differences
 
 ### **Run a Query**
 ```sh
@@ -103,11 +105,11 @@ python query.py
 ```
 This will:
 1. Generate embeddings for `"My query"`
-2. Perform a **hybrid search**:
-   - **Sparse retrieval** (Splade)
-   - **Dense retrieval** (MiniLM)
-   - **RRF fusion** to combine rankings
-3. **Apply late interaction reranking** to refine the top results
+2. Perform three types of searches for comparison:
+   - **Semantic search only** (dense vectors)
+   - **Lexical search only** (sparse vectors)
+   - **Hybrid search with RRF + late interaction reranking**
+3. **Plot the top 10 results from each approach** to compare the differences
 4. Return the **top 10 most relevant documents**
 
 ---
@@ -125,7 +127,7 @@ This will:
 - **[Qdrant](https://qdrant.tech/)** - Vector database for similarity search
 - **[FastEmbed](https://github.com/quickembedding/fastembed)** - Embedding model wrapper
 - **[Docker](https://www.docker.com/)** - Containerized Qdrant setup
-- **Python (FastEmbed, Qdrant Client)**
+- **Python (FastEmbed, Qdrant Client, Matplotlib)**
 
 ---
 
@@ -158,9 +160,6 @@ Ensure Qdrant is accessible on `http://localhost:6333`:
 curl http://localhost:6333/healthz
 ```
 
-### **Performance Optimization**
-- Increase **shards** and **replication factor** in `ingest.py`
-
 ---
 
 ## **9. Next Steps**
@@ -169,6 +168,8 @@ curl http://localhost:6333/healthz
 - Experiment with **different embedding models** for retrieval
 
 🚀 **Enjoy building hybrid search systems with Qdrant!**
+
+
 
 
 
