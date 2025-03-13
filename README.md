@@ -44,9 +44,6 @@ pip install -r requirements.txt
 This will install all necessary libraries, including:
 - `qdrant-client` (Qdrant database client)
 - `fastembed` (embedding model wrapper)
-- `sentence-transformers` (for dense embeddings)
-- `torch` (for late interaction models)
-- `matplotlib` (for visualizing search results)
 
 ---
 
